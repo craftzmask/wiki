@@ -62,3 +62,33 @@ def create(request):
     return render(request, 'encyclopedia/create.html', {
         'form': NewEntryForm()
     })
+    
+    
+def edit(request, title):
+    if request.method == 'POST':
+        form = NewEntryForm(request.POST)
+        print(form)
+        if form.is_valid():
+            content = form.cleaned_data['content']
+            util.save_entry(title, content)
+            return HttpResponseRedirect(reverse(
+                'encyclopedia:view_entry', args=[title]
+            ))
+        else:
+            return render(request, 'encyclopedia/edit.html', {
+                'title': title,
+                'form': form
+            })
+    
+    form = NewEntryForm(initial={
+        'title': title,
+        'content': util.get_entry(title)
+    })
+    
+    # Ensure the title cannot be changed
+    form.fields['title'].widget.attrs['readonly'] = True
+
+    return render(request, 'encyclopedia/edit.html', {
+        'title': title,
+        'form': form
+    })
