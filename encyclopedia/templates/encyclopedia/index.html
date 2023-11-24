@@ -11,6 +11,9 @@
             <li>
                 <a href="{% url 'encyclopedia:view_entry' entry %}">{{ entry }}</a>
             </li>
+
+        {% empty %}
+            <li>No entry</li>
         {% endfor %}
     </ul>
 {% endblock %}

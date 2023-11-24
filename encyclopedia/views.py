@@ -1,5 +1,7 @@
 from django.http import Http404
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from . import util
 
@@ -18,3 +20,21 @@ def view_entry(request, title):
         'title': title,
         'entry': entry
     })
+    
+
+def search(request):
+    query = request.GET['q']
+    
+    titles = util.list_entries()
+    
+    if titles.count(query) == 1:
+        return HttpResponseRedirect(reverse(
+            'encyclopedia:view_entry', args=[query]
+        ))
+    
+    search_result = [title for title in titles if query in title]
+    return render(request, 'encyclopedia/index.html', {
+        'entries': search_result
+    })
+
+    
