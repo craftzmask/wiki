@@ -1,3 +1,5 @@
+import random
+
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.urls import reverse
@@ -92,3 +94,10 @@ def edit(request, title):
         'title': title,
         'form': form
     })
+    
+    
+def random_entry(request):
+    return HttpResponseRedirect(reverse(
+        'encyclopedia:view_entry',
+        args=[random.choice(util.list_entries())]
+    ))
