@@ -1,4 +1,5 @@
 import random
+import markdown2
 
 from django.shortcuts import render
 from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
@@ -24,7 +25,7 @@ def view_entry(request, title):
         raise Http404("Entry does not exist")
     return render(request, 'encyclopedia/entry.html', {
         'title': title,
-        'entry': entry
+        'entry': markdown2.markdown(entry)
     })
     
 
