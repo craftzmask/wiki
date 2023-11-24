@@ -1,9 +1,13 @@
-from django.http import Http404
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponseBadRequest
 from django.urls import reverse
+from django import forms
 
 from . import util
+
+class NewEntryForm(forms.Form):
+    title = forms.CharField(label='Title', max_length=50)
+    content = forms.CharField(widget=forms.Textarea(attrs={"rows": 10, "cols": 50}))
 
 # Create your views here.
 def index(request):
@@ -37,4 +41,24 @@ def search(request):
         'entries': search_result
     })
 
-    
+
+def create(request):
+    if request.method == 'POST':
+        form = NewEntryForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            
+            if util.get_entry(title):
+                return HttpResponseBadRequest('<h1>The entry is already existed</h1>')
+            
+            content = form.cleaned_data['content']
+            util.save_entry(title, content)
+            return HttpResponseRedirect(reverse('encyclopedia:index'))
+        else:
+            return render(request, 'encyclopedia/create.html', {
+                'form': form
+            })
+            
+    return render(request, 'encyclopedia/create.html', {
+        'form': NewEntryForm()
+    })
